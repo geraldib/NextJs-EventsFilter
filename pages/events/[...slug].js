@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
-import { getFilteredEvents } from "@/dummy-data";
-import EventList from "@/components/events/EventList";
-import ErrorAlert from "@/components/ui/error-alert/ErrorAlert";
+import { getFilteredEvents } from "../../dummy-data";
+import EventList from "../../components/events/EventList";
+import ErrorAlert from "../../components/ui/error-alert/ErrorAlert";
 
 const FilteredEventsPage = () => {
   const router = useRouter();
