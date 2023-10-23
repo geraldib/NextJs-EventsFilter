@@ -1,33 +1,57 @@
-import { useRouter } from "next/router";
-import { getFilteredEvents } from "../../dummy-data";
+import Head from "next/head";
+import { getFilteredEvents } from "../../helpers/api-util";
 import EventList from "../../components/events/EventList";
 import ErrorAlert from "../../components/ui/error-alert/ErrorAlert";
 
-const FilteredEventsPage = () => {
-  const router = useRouter();
-  const filterData = router.query.slug;
-
-  if (!filterData) {
-    return <p className="center">Loading...</p>;
-  }
-
-  const filteredYear = +filterData[0];
-  const filteredMonth = +filterData[1];
-
-  const filteredEvents = getFilteredEvents({
-    year: filteredYear,
-    month: filteredMonth,
-  });
+const FilteredEventsPage = (props) => {
+  const { filteredEvents, year, month } = props;
 
   if (!filteredEvents || filteredEvents.length === 0) {
-    return <ErrorAlert>No Events found for the choosen filter</ErrorAlert>;
+    return (
+      <>
+        <title>Filtered Events</title>
+        <meta
+          name="description"
+          content="No Events was found with these parameters"
+        />
+        <ErrorAlert>No Events found for the choosen filter</ErrorAlert>
+      </>
+    );
   }
 
   return (
     <>
+      <Head>
+        <title>Filtered Events</title>
+        <meta
+          name="description"
+          content={`All events for year ${year} and month ${month}`}
+        />
+      </Head>
       <EventList items={filteredEvents} />
     </>
   );
 };
 
 export default FilteredEventsPage;
+
+export const getServerSideProps = async (context) => {
+  const { params } = context;
+
+  const filterData = params.slug;
+  const filteredYear = +filterData[0];
+  const filteredMonth = +filterData[1];
+
+  const filteredEvents = await getFilteredEvents({
+    year: filteredYear,
+    month: filteredMonth,
+  });
+
+  return {
+    props: {
+      filteredEvents: filteredEvents,
+      year: filteredYear,
+      month: filteredMonth,
+    },
+  };
+};
